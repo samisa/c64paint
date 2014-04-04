@@ -1,0 +1,25 @@
+
+
+.c64-CanvasView {
+        width: 640px;
+        height: 400px;
+}
+
+.c64-ColorSelector {
+    > div {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+.c64-ZoomControl {
+    
+    > .c64-buttons {
+        > .button {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+        }
+    }
+}
