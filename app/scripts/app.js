@@ -2,7 +2,7 @@
 define(['jquery',
        'underscore',
        'MainView'], 
-       function ($, _, MainView) {
+function ($, _, MainView) {
     'use strict';
 
     return {

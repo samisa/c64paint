@@ -1,25 +1,40 @@
 define(["jquery", 
         "underscore",
         "backbone",
-        "CanvasView"], 
-function($, _, Backbone, CanvasView) {
+        "CanvasView",
+        "FileSelector",
+        "fileUtil"], 
+       function($, _, Backbone, CanvasView, FileSelector, fileUtil) {
+    'use strict';
+
     return Backbone.View.extend({
 	tagName: "div",
-//	className: "todo-item",
-//	visible: true,
-//	template: itemTpl,
-
-
+        
 	initialize: function() {
-            var canvasView = new CanvasView({viewName: 'canvas-view'});
-            this.$el.append(canvasView.$el);
-        }
+            this.fileSelector = new FileSelector();
+            this.canvasView = new CanvasView({viewName: 'canvas-view'});
+         
+            this.listenTo(this.fileSelector, 'c64:file-selected', this.setFile);
+            this.listenTo(this.fileSelector, 'c64:save-image', this.saveImage);
 
-	// render: function () {
-	// 		this.$el.html(this.template(this.model.toJSON()));
-	// 		this.vToggleDone();
-	// 		return this;
-	// 	},
+            this.$el
+                .append(this.fileSelector.$el)
+                .append(this.canvasView.$el);
+        },
+
+        setFile: function() {
+            var that = this;
+            this.fileSelector.getFileContents().done(function(bytes) {
+                //validate bytes...
+                that.canvasView.setImage(bytes);
+
+                //var colorMap = fileUtil.bytesToColorIndexMap(bytes);
+            });
+        },
+
+        saveImage: function() {
+            this.fileSelector.saveImg(this.canvasView.getDataRef());
+        }
 
     });
 });

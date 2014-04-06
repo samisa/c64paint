@@ -35,7 +35,10 @@ define(["jquery",
             "mousemove .c64-paintCanvas": "mouseMove",
             "mousedown .c64-paintCanvas": "mouseDown",
             "mouseup .c64-paintCanvas": "mouseUp",
-            "mouseout .c64-paintCanvas": "mouseOut"
+            "mouseout .c64-paintCanvas": "mouseOut",
+            "contextmenu .c64-paintCanvas": function(e){
+                return false;
+            } 
 	},
 
 	initialize: function() {            
@@ -64,6 +67,19 @@ define(["jquery",
 
             this.repaint();
             this.setColor(2);
+        },
+
+        getDataRef: function() {
+            return this.colormap;
+        },
+
+        setImage: function(pixels) {//assume 200x320 pixels
+            for (j = 0; j < 200; j++) {
+                for (i = 0; i < 160; i++) {
+                    this.colormap[j*160 + i] = pixels[j*320 + 2 * i];
+                }
+            }
+            this.repaint();
         },
 
         setViewBox: function(vals) {
@@ -125,6 +141,8 @@ define(["jquery",
             this.colormap[ij[0] + ij[1] * 160] = this.currentColorIndex;
             this.drawPoint(ij[0], ij[1], COLORS[this.currentColorIndex]);
             this.painting = true;
+
+            return false;//To prevent text select cursor when painting
         },
 
         mouseMove: function(ev) {
@@ -154,14 +172,5 @@ define(["jquery",
         mouseOut: function() {
             this.painting = false;
         }
-                                    
-                                    
-                                    
-	// render: function () {
-	// 		this.$el.html(this.template(this.model.toJSON()));
-	// 		this.vToggleDone();
-	// 		return this;
-	// 	},
-
     });
 });
