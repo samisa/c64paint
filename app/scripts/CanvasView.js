@@ -36,9 +36,11 @@ define(["jquery",
             "mousedown .c64-paintCanvas": "mouseDown",
             "mouseup .c64-paintCanvas": "mouseUp",
             "mouseout .c64-paintCanvas": "mouseOut",
-            "contextmenu .c64-paintCanvas": function(e){
+            "contextmenu .c64-paintCanvas": function(e) {
+                //prevent context menu
                 return false;
-            } 
+            },
+            "click .c64-toggleGrid": "toggleGrid"
 	},
 
 	initialize: function() {            
@@ -56,14 +58,17 @@ define(["jquery",
             this.boxcorner = [0, 0];
             var buffer = new ArrayBuffer(200 * 160);
             this.colormap = new Int8Array(buffer);
-
-            var colorSelector = new ColorSelector({ colors: COLORS });
-            this.$el.append(colorSelector.$el);
-            this.listenTo(colorSelector, 'c64:colorSelected', this.setColor);
             
             var zoomControl = new ZoomControl({ bitmapRef: this.colormap, colors: COLORS });
             this.$el.append(zoomControl.$el);
             this.listenTo(zoomControl, 'c64:zoomRectChanged', this.setViewBox);
+
+            var colorSelector = new ColorSelector({ colors: COLORS });
+            this.$el.append(colorSelector.$el);
+            this.listenTo(colorSelector, 'c64:colorSelected', this.setColor);
+
+            this.$el.append($('<button>').addClass('c64-toggleGrid').text('Toggle grid'));
+            this.$el.append($('<button>').addClass('c64-toggleValidation').text('Toggle Validation'));
 
             this.repaint();
             this.setColor(2);
@@ -85,7 +90,6 @@ define(["jquery",
         setViewBox: function(vals) {
             this.scale = vals.scale;
             // box corner is in i,j coords
-            //HERE should min/max of possible values...
             this.boxcorner = [Math.floor(vals.center[0] - 80/vals.scale),
                               Math.floor(vals.center[1] - 100/vals.scale)];
             this.repaint();
@@ -102,9 +106,40 @@ define(["jquery",
                     this.drawPoint(i, j, COLORS[this.colormap[j * 160 + i]]);
                 }
             }
+
+            if (this.showGrid) {
+                //scaled  xy-coordinates
+                var gap = this.scale * this.w/320*8;
+                var offsetX = (gap / 8) * (this.boxcorner[0] % 4) * 2;
+                var offsetY = (gap / 8) * (this.boxcorner[1] % 8);
+
+                var vertLineCount = this.w / gap;
+                var horLineCount = this.h / gap;
+
+                this.ctx.save();
+                this.ctx.strokeStyle = "rgb(255, 0, 0)";
+                this.ctx.lineWidth = 0.5;
+                for (i = 0; i <= vertLineCount; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(i*gap + offsetX, 0);
+                    this.ctx.lineTo(i*gap + offsetX, this.h);
+                    this.ctx.closePath();
+                    this.ctx.stroke();
+                }
+
+                for (i = 0; i <= horLineCount; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, i*gap + offsetY);
+                    this.ctx.lineTo(this.w, i * gap + offsetY);
+                    this.ctx.closePath();
+                    this.ctx.stroke();
+                }
+
+                this.ctx.restore();
+            }
         },
 
-        toGridSquare: function(x, y) {
+        toijCoord: function(x, y) {
             return  [Math.floor(x / (this.w *this.scale) * 160) + this.boxcorner[0], Math.floor(y / (this.h *this.scale) * 200) + this.boxcorner[1]];
         },
 
@@ -137,7 +172,7 @@ define(["jquery",
                 y = ev.offsetY;
             }
 
-            var ij = this.toGridSquare(x, y);
+            var ij = this.toijCoord(x, y);
             this.colormap[ij[0] + ij[1] * 160] = this.currentColorIndex;
             this.drawPoint(ij[0], ij[1], COLORS[this.currentColorIndex]);
             this.painting = true;
@@ -160,7 +195,7 @@ define(["jquery",
                 y = ev.offsetY;
             }
 
-            var ij = this.toGridSquare(x, y);
+            var ij = this.toijCoord(x, y);
             this.colormap[ij[0] + ij[1] * 160] = this.currentColorIndex;
             this.drawPoint(ij[0], ij[1], COLORS[this.currentColorIndex]);
         },
@@ -171,6 +206,11 @@ define(["jquery",
                                     
         mouseOut: function() {
             this.painting = false;
+        },
+
+        toggleGrid: function() {
+            this.showGrid = !this.showGrid;
+            this.repaint();
         }
     });
 });

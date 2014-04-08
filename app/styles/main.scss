@@ -1,11 +1,33 @@
+@import "compass/css3/user-interface";
 
+$baseMargin: 3px;
 
 .c64-CanvasView {
-        width: 640px;
-        height: 400px;
+    width: 100%;
+    height: 400px;
+}
+
+.c64-paintCanvas {
+    margin: $baseMargin;
+    float: left;
+}
+
+.c64-ZoomControl {    
+    margin: $baseMargin;
+    width: 160px;
+    float: left;
+    > .c64-buttons {
+        > button {
+            display: inline-block;
+            width: 50%;
+            height: 30px;
+        }
+    }
 }
 
 .c64-ColorSelector {
+    margin: $baseMargin;
+    clear: both;
     > div {
         display: inline-block;
         width: 30px;
@@ -13,13 +35,3 @@
     }
 }
 
-.c64-ZoomControl {
-    
-    > .c64-buttons {
-        > .button {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-        }
-    }
-}
