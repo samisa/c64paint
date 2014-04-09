@@ -65,13 +65,17 @@ define(["jquery",
 
             var colorSelector = new ColorSelector({ colors: COLORS });
             this.$el.append(colorSelector.$el);
-            this.listenTo(colorSelector, 'c64:colorSelected', this.setColor);
+
+            this.listenTo(colorSelector, 'c64:colorSelected:primary', this.setPrimaryColor);
+            this.listenTo(colorSelector, 'c64:colorSelected:secondary', this.setSecondaryColor);
+            colorSelector.selectPrimaryColor(1);
+//            this.setColor(2);
+
 
             this.$el.append($('<button>').addClass('c64-toggleGrid').text('Toggle grid'));
             this.$el.append($('<button>').addClass('c64-toggleValidation').text('Toggle Validation'));
 
             this.repaint();
-            this.setColor(2);
         },
 
         getDataRef: function() {
@@ -95,8 +99,12 @@ define(["jquery",
             this.repaint();
         },
 
-        setColor: function(i) {
-            this.currentColorIndex = i;
+        setPrimaryColor: function(i) {
+            this.currentPrimaryColorIndex = i;
+        },
+
+        setSecondaryColor: function(i) {
+            this.currentSecondaryColorIndex = i;
         },
 
         repaint: function() {
@@ -173,8 +181,10 @@ define(["jquery",
             }
 
             var ij = this.toijCoord(x, y);
-            this.colormap[ij[0] + ij[1] * 160] = this.currentColorIndex;
-            this.drawPoint(ij[0], ij[1], COLORS[this.currentColorIndex]);
+
+            var color = ev.button > 1 ?  this.currentSecondaryColorIndex: this.currentPrimaryColorIndex;
+            this.colormap[ij[0] + ij[1] * 160] = color;
+            this.drawPoint(ij[0], ij[1], COLORS[color]);
             this.painting = true;
 
             return false;//To prevent text select cursor when painting
@@ -196,8 +206,9 @@ define(["jquery",
             }
 
             var ij = this.toijCoord(x, y);
-            this.colormap[ij[0] + ij[1] * 160] = this.currentColorIndex;
-            this.drawPoint(ij[0], ij[1], COLORS[this.currentColorIndex]);
+            var color = ev.button > 1 ?  this.currentSecondaryColorIndex: this.currentPrimaryColorIndex;
+            this.colormap[ij[0] + ij[1] * 160] = color;
+            this.drawPoint(ij[0], ij[1], COLORS[color]);
         },
 
         mouseUp: function() {

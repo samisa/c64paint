@@ -26,6 +26,9 @@ $baseMargin: 3px;
 }
 
 .c64-ColorSelector {
+    width: 640px;
+    position: relative;
+    
     margin: $baseMargin;
     clear: both;
     > div {
@@ -33,5 +36,23 @@ $baseMargin: 3px;
         width: 30px;
         height: 30px;
     }
+
+    .c64-secondarySelection {
+        position: absolute;
+        right: 0px;
+        border-width: 1px;
+        border-color: black;
+        border-style: solid;
+    }
+
+    .c64-primarySelection {
+        position: absolute;
+        right: 30px;
+        float: right;
+        border-width: 1px;
+        border-color: black;
+        border-style: solid;
+    }
+
 }
 
