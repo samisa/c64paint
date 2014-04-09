@@ -9,13 +9,11 @@ function($, _, Backbone) {
 
 	events: {
             "click > .c64-colorItem": function(e) {
-                this.$el.find('.c64-primarySelection').css({ 'background': $(e.target).css('background') });
                 this.selectPrimaryColor($(e.target).index());
                 return false;
             },
 
             "contextmenu > .c64-colorItem": function(e) { // = right click
-                this.$el.find('.c64-secondarySelection').css({ 'background': $(e.target).css('background') });
                 this.selectSecondaryColor($(e.target).index());
                 return false;
             },
@@ -35,11 +33,14 @@ function($, _, Backbone) {
         },
 
         selectPrimaryColor: function(index) {
-          this.trigger('c64:colorSelected:primary', index);
-  
+            this.$el.find('.c64-primarySelection')
+                .css({ 'background': $(this.$el.children()[index]).css('background') });
+            this.trigger('c64:colorSelected:primary', index);  
         },
 
         selectSecondaryColor: function(index) {
+            this.$el.find('.c64-secondarySelection')
+                .css({ 'background': $(this.$el.children()[index]).css('background') });
           this.trigger('c64:colorSelected:secondary', index);
         }
     });

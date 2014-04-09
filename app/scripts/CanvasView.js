@@ -69,6 +69,7 @@ define(["jquery",
             this.listenTo(colorSelector, 'c64:colorSelected:primary', this.setPrimaryColor);
             this.listenTo(colorSelector, 'c64:colorSelected:secondary', this.setSecondaryColor);
             colorSelector.selectPrimaryColor(1);
+            colorSelector.selectSecondaryColor(0);
 //            this.setColor(2);
 
 
