@@ -25,6 +25,17 @@ $baseMargin: 3px;
     }
 }
 
+.c64-toolBox {
+    > div {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-width: 1px;
+        border-color: black;
+        border-style: solid;
+    }
+}
+
 .c64-ColorSelector {
     width: 640px;
     position: relative;
