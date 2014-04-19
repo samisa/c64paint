@@ -59,8 +59,12 @@ define(["jquery",
             },
             "click .c64-toggleGrid": "toggleGrid",
             "click .c64-toggleValidation": "toggleValidation",
-            "click .c64-tool-brush": function() { this.selectTool('brush'); },
-            "click .c64-tool-bucket": function() { this.selectTool('bucket'); }
+            "click .c64-tool-brush": function() {
+                this.selectTool('brush'); 
+            },
+            "click .c64-tool-bucket": function() { 
+                this.selectTool('bucket'); 
+            }
 
 	},
 
@@ -243,6 +247,9 @@ define(["jquery",
         },
 
         selectTool: function(toolName) {
+            this.$el.find('.c64-toolBox > div').removeClass('c64-selected');
+            this.$el.find('.c64-tool-' + toolName).addClass('c64-selected');
+
             if (this.tool) {
                 this.tool.remove();
             }

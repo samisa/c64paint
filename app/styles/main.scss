@@ -33,7 +33,22 @@ $baseMargin: 3px;
         border-width: 1px;
         border-color: black;
         border-style: solid;
+
+        &.c64-selected {
+            border-width: 3px;
+        }
     }
+
+    .c64-tool-brush {
+        background-image: url('../images/brush.png');
+        background-size: 100%;
+    }
+
+    .c64-tool-bucket {
+        background-image: url('../images/bucket.png');
+        background-size: 100%;
+    }
+
 }
 
 .c64-ColorSelector {
