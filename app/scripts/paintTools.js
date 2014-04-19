@@ -1,7 +1,8 @@
 define(["jquery", 
-        "underscore"
+        "underscore",
+        'backbone'
 ], 
-function($, _) {
+function($, _, Backbone) {
 
     function getEventCoords(ev) {
         var x, y;
@@ -15,8 +16,9 @@ function($, _) {
         
         return [x,y];
     }
-
+           
     var Brush = function(canvasView) {
+        var that = this;
         var painting = false;
         var $canvas = canvasView.get$Canvas();
 
@@ -37,11 +39,15 @@ function($, _) {
         };
 
         function mouseUp() {
+            that.trigger('c64-paintevent');
             painting = false;
         };
 
         function mouseOut() {
-            painting = false;
+            if (painting) {
+                that.trigger('c64-paintevent');
+                painting = false;
+            }
             //TODO: on mouse in check if button is down and painting...
         };
 
@@ -55,12 +61,14 @@ function($, _) {
             $canvas.off('mouseup', mouseUp);
             $canvas.off('mousedown', mouseDown);
             $canvas.off('mouseout', mouseOut);
+            that.off();
         }
     };
 
     var Bucket = function(canvasView){
         var colormap = canvasView.getDataRef();
         var $canvas = canvasView.get$Canvas();
+        var that = this;
 
         function fill(ev) {
             var xy = getEventCoords(ev);
@@ -68,6 +76,7 @@ function($, _) {
             var startColor = colormap[ij[0] + ij[1] * 160];
             floodFill(ij[0], ij[1], canvasView.currentPrimaryColorIndex, startColor);
             canvasView.repaint();
+            that.trigger('c64-paintevent');
             return false;
         }
 
@@ -114,7 +123,8 @@ function($, _) {
         $canvas.on('click', fill);
 
         this.remove = function() {
-            $canvas.off('click', fill);            
+            $canvas.off('click', fill);
+            that.off();
         }
     };
     
@@ -126,6 +136,9 @@ function($, _) {
         } 
     };
 
+    _.extend(Brush.prototype, Backbone.Events);
+    _.extend(Bucket.prototype, Backbone.Events);
+    
     return {
         getTool: getTool
     }    

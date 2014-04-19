@@ -5,6 +5,7 @@ $baseMargin: 3px;
 .c64-CanvasView {
     width: 100%;
     height: 400px;
+    position: relative;
 }
 
 .c64-paintCanvas {
@@ -12,10 +13,17 @@ $baseMargin: 3px;
     float: left;
 }
 
-.c64-ZoomControl {    
+
+.c64-sidePanel {
     margin: $baseMargin;
     width: 160px;
     float: left;
+    position: absolute;
+    left: 750px + $baseMargin;
+    top: 0px;
+}
+
+.c64-ZoomControl {    
     > .c64-buttons {
         > button {
             display: inline-block;
@@ -82,3 +90,9 @@ $baseMargin: 3px;
 
 }
 
+.c64-undoView {
+    > button {
+        height: 20px;
+        width: 60px;
+    }
+}

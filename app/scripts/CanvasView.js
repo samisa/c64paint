@@ -3,8 +3,9 @@ define(["jquery",
         "backbone",
         "ColorSelector",
         "ZoomControl",
-        "paintTools"], 
-       function($, _, Backbone, ColorSelector, ZoomControl, tools) {
+        "paintTools",
+        "UndoView"], 
+       function($, _, Backbone, ColorSelector, ZoomControl, tools, UndoView) {
 
     var ASPECT = 320/200;
 
@@ -49,10 +50,6 @@ define(["jquery",
         className: 'c64-CanvasView',
 
 	events: {
-            // "mousemove .c64-paintCanvas": "mouseMove",
-            // "mousedown .c64-paintCanvas": "mouseDown",
-            // "mouseup .c64-paintCanvas": "mouseUp",
-            // "mouseout .c64-paintCanvas": "mouseOut",
             "contextmenu .c64-paintCanvas": function(e) {
                 //prevent context menu
                 return false;
@@ -85,26 +82,37 @@ define(["jquery",
             this.colormap = new Int8Array(buffer);
             
             var zoomControl = new ZoomControl({ bitmapRef: this.colormap, colors: COLORS });
-            this.$el.append(zoomControl.$el);
             this.listenTo(zoomControl, 'c64:zoomRectChanged', this.setViewBox);
 
             var colorSelector = new ColorSelector({ colors: COLORS });
             this.$el.append(colorSelector.$el);
-
             this.listenTo(colorSelector, 'c64:colorSelected:primary', this.setPrimaryColor);
             this.listenTo(colorSelector, 'c64:colorSelected:secondary', this.setSecondaryColor);
             colorSelector.selectPrimaryColor(1);
             colorSelector.selectSecondaryColor(0);
-//            this.setColor(2);
 
-            this.$el.append($('<div>').addClass('c64-toolBox').append(
-                $('<div>').addClass('c64-tool-brush'),
-                $('<div>').addClass('c64-tool-bucket')));
+            this.undoView = new UndoView(this.colormap, 4);
+            this.listenTo(this.undoView, 'c64:undo', this.repaint);
+            this.listenTo(this.undoView, 'c64:redo', this.repaint);
+
+
+            this.$el.append($('<div>').addClass('c64-sidePanel').append(
+                zoomControl.$el,
+                $('<div>').addClass('c64-toolBox').append(
+                    $('<div>').addClass('c64-tool-brush'),
+                    $('<div>').addClass('c64-tool-bucket')),
+                this.undoView.$el
+            ));
+
             this.$el.append($('<button>').addClass('c64-toggleGrid').text('Toggle grid'));
             this.$el.append($('<button>').addClass('c64-toggleValidation').text('Toggle Validation'));
 
             this.selectTool('brush');
             this.repaint();
+        },
+
+        pushState: function() {
+            this.undoView.pushState();
         },
 
         getDataRef: function() {
@@ -255,6 +263,8 @@ define(["jquery",
             }
 
             this.tool = tools.getTool(toolName, this);
+            this.listenTo(this.tool, 'c64-paintevent', this.pushState);  //TODO: mouseouts and clicks should also trigger push date in some cases... THE TOOL SHOULD TRIGGER PAINT EVENTS...
+
         },
 
         get$Canvas: function() {
