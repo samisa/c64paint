@@ -1,6 +1,26 @@
 @import "compass/css3/user-interface";
+@import "compass/css3/box-shadow";
 
 $baseMargin: 3px;
+$widgetMargin: 6px;
+
+$widgetBackground: rgb(200, 200, 180);
+$mainBackground: rgb(255, 240, 200);
+$canvasWidth: 750px;
+
+.c64-mainView { 
+    margin-top: 25px;
+    margin-left: 50px;
+}
+
+body {
+    background-color: $mainBackground;
+    background-image: url('../images/green_cup.png');
+    background-repeat: repeat;
+ 
+}
+
+
 
 .c64-CanvasView {
     width: 100%;
@@ -9,22 +29,47 @@ $baseMargin: 3px;
 }
 
 .c64-paintCanvas {
-    margin: $baseMargin;
+    @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
+
+//    margin: $baseMargin;
     float: left;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
 }
 
 
 .c64-sidePanel {
-    margin: $baseMargin;
-    width: 160px;
+    > div {
+        @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
+    }
+
+    box-sizing: border-box;
+  //  margin: 0px $widgetMargin $widgetMargin $widgetMargin;
+    width: 160px + 2*$baseMargin;
     float: left;
     position: absolute;
-    left: 750px + $baseMargin;
+    left: $canvasWidth + $widgetMargin;
     top: 0px;
 }
 
 .c64-ZoomControl {    
+    margin-bottom: $widgetMargin;
+    background-color: $widgetBackground;
+    padding: $baseMargin;
+//    margin: 0px 0px 0px $widgetMargin;
+
+    > canvas {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     > .c64-buttons {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: $baseMargin;
+//        width: 160px - 2*$baseMargin;
         > button {
             display: inline-block;
             width: 50%;
@@ -34,6 +79,9 @@ $baseMargin: 3px;
 }
 
 .c64-toolBox {
+    margin-bottom: $widgetMargin;
+    background-color: $widgetBackground;
+
     > div {
         display: inline-block;
         width: 30px;
@@ -59,9 +107,23 @@ $baseMargin: 3px;
 
 }
 
+.c64-gridButtons {
+    padding: $baseMargin;
+    margin-bottom: $widgetMargin;
+    background-color: $widgetBackground;
+    button {
+        width: 100%;
+    }
+}
+
 .c64-ColorSelector {
-    width: 640px;
+    @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
+
+    top: $widgetMargin;
+   
+    width: $canvasWidth;
     position: relative;
+    background-color: $widgetBackground;
     
     margin: $baseMargin;
     clear: both;
@@ -91,8 +153,10 @@ $baseMargin: 3px;
 }
 
 .c64-undoView {
+    background-color: $widgetBackground;
+    padding: $baseMargin;
     > button {
         height: 20px;
-        width: 60px;
+        width: 50%;
     }
 }

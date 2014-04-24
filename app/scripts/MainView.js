@@ -9,7 +9,8 @@ define(["jquery",
 
     return Backbone.View.extend({
 	tagName: "div",
-        
+        className: 'c64-mainView',
+
 	initialize: function() {
             this.fileSelector = new FileSelector();
             this.canvasView = new CanvasView({viewName: 'canvas-view'});

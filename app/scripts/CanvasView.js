@@ -81,8 +81,8 @@ define(["jquery",
             var buffer = new ArrayBuffer(200 * 160);
             this.colormap = new Int8Array(buffer);
             
-            var zoomControl = new ZoomControl({ bitmapRef: this.colormap, colors: COLORS });
-            this.listenTo(zoomControl, 'c64:zoomRectChanged', this.setViewBox);
+            this.zoomControl = new ZoomControl({ bitmapRef: this.colormap, colors: COLORS });
+            this.listenTo(this.zoomControl, 'c64:zoomRectChanged', this.setViewBox);
 
             var colorSelector = new ColorSelector({ colors: COLORS });
             this.$el.append(colorSelector.$el);
@@ -97,15 +97,17 @@ define(["jquery",
 
 
             this.$el.append($('<div>').addClass('c64-sidePanel').append(
-                zoomControl.$el,
+                this.zoomControl.$el,
                 $('<div>').addClass('c64-toolBox').append(
                     $('<div>').addClass('c64-tool-brush'),
                     $('<div>').addClass('c64-tool-bucket')),
+                $('<div>').addClass('c64-gridButtons').append(
+                    $('<button>').addClass('c64-toggleGrid').text('Toggle grid'),
+                    $('<button>').addClass('c64-toggleValidation').text('Toggle Validation')),
+                
                 this.undoView.$el
             ));
 
-            this.$el.append($('<button>').addClass('c64-toggleGrid').text('Toggle grid'));
-            this.$el.append($('<button>').addClass('c64-toggleValidation').text('Toggle Validation'));
 
             this.selectTool('brush');
             this.repaint();
@@ -113,6 +115,7 @@ define(["jquery",
 
         pushState: function() {
             this.undoView.pushState();
+            this.zoomControl.render();
         },
 
         getDataRef: function() {
@@ -125,6 +128,7 @@ define(["jquery",
                     this.colormap[j*160 + i] = pixels[j*320 + 2 * i];
                 }
             }
+            this.pushState();
             this.repaint();
         },
 
