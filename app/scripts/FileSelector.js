@@ -1,19 +1,19 @@
-define(["jquery", 
+define(["jquery",
         "underscore",
         "backbone",
-        "fileUtil"], 
+        "fileUtil"],
 function($, _, Backbone, fileUtil) {
     'use strict';
 
     return Backbone.View.extend({
-	tagName: "div",
+        tagName: "div",
 
         events: {
-            'change .c64-fileSelect': 'fileSelected', 
+            'change .c64-fileSelect': 'fileSelected',
             'click .c64-fileSave': 'savePressed'
         },
 
-	initialize: function() {
+        initialize: function() {
             if (!window.File || !window.FileReader && !window.FileList || !window.Blob) {
                 alert('The File APIs are not fully supported in this browser.');
             }
@@ -45,7 +45,7 @@ function($, _, Backbone, fileUtil) {
             //TODO: support c64 loadable image format
             var reader = new window.FileReader();
             var def = $.Deferred();
-            
+
             reader.onload = function(e) {
                 def.resolve(new window.Int8Array(e.target.result));
             };
@@ -62,9 +62,9 @@ function($, _, Backbone, fileUtil) {
                 def.reject();
             }
 
-            reader.readAsArrayBuffer(this.file);            
+            reader.readAsArrayBuffer(this.file);
 
             return def.promise();
-        }        
+        }
     });
 });

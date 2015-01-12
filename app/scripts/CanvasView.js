@@ -1,32 +1,14 @@
-define(["jquery", 
+define(["jquery",
         "underscore",
         "backbone",
         "ColorSelector",
         "ZoomControl",
         "paintTools",
-        "UndoView"], 
-       function($, _, Backbone, ColorSelector, ZoomControl, tools, UndoView) {
+        "UndoView",
+        "json!palette.json"],
+       function($, _, Backbone, ColorSelector, ZoomControl, tools, UndoView, COLORS) {
 
     var ASPECT = 320/200;
-
-    var COLORS = [
-        'rgb(0,0,0)',
-        'rgb(255, 255, 255)',
-        'rgb(116, 66, 53)',
-        'rgb(124, 172, 186)',
-        'rgb(123, 72, 144)',
-        'rgb(100, 151, 79)',
-        'rgb(64, 50, 133)',
-        'rgb(191, 205, 122)',
-        'rgb(123, 91, 47)',
-        'rgb(79, 69, 0)',
-        'rgb(163, 114, 101)',
-        'rgb(80, 80, 80)',
-        'rgb(120, 120, 120)',
-        'rgb(164, 215, 142)',
-        'rgb(120, 106, 189)',
-        'rgb(159, 159, 159)'
-    ];
 
     //input = 200 * 160 array
     var validateMulticolor = function(colorIndexArray) {
@@ -40,16 +22,16 @@ define(["jquery",
             }
         }
 
-        return _.chain(blocks).map(function(b) { 
-            return _.uniq(b).length <= 4 
+        return _.chain(blocks).map(function(b) {
+            return _.uniq(b).length <= 4;
         }).value();
-    }
+    };
 
     return Backbone.View.extend({
-	tagName: "div",
+        tagName: "div",
         className: 'c64-CanvasView',
 
-	events: {
+        events: {
             "contextmenu .c64-paintCanvas": function(e) {
                 //prevent context menu
                 return false;
@@ -57,30 +39,30 @@ define(["jquery",
             "click .c64-toggleGrid": "toggleGrid",
             "click .c64-toggleValidation": "toggleValidation",
             "click .c64-tool-brush": function() {
-                this.selectTool('brush'); 
+                this.selectTool('brush');
             },
-            "click .c64-tool-bucket": function() { 
-                this.selectTool('bucket'); 
+            "click .c64-tool-bucket": function() {
+                this.selectTool('bucket');
             }
 
-	},
+        },
 
-	initialize: function() {            
+        initialize: function() {
             this.painting = false;
-            this.$canvas = $('<canvas>').addClass('c64-paintCanvas');    
+            this.$canvas = $('<canvas>').addClass('c64-paintCanvas');
             this.$el.append(this.$canvas);
             this.ctx = this.$canvas[0].getContext("2d");
-            
+
             this.w = 750;
             this.h = this.w/ASPECT;
             this.$canvas.attr({'width': this.w + 'px'});
             this.$canvas.attr({'height': this.h + 'px'});
-            
+
             this.scale = 1;
             this.boxcorner = [0, 0];
             var buffer = new ArrayBuffer(200 * 160);
             this.colormap = new Int8Array(buffer);
-            
+
             this.zoomControl = new ZoomControl({ bitmapRef: this.colormap, colors: COLORS });
             this.listenTo(this.zoomControl, 'c64:zoomRectChanged', this.setViewBox);
 
@@ -104,7 +86,7 @@ define(["jquery",
                 $('<div>').addClass('c64-gridButtons').append(
                     $('<button>').addClass('c64-toggleGrid').text('Toggle grid'),
                     $('<button>').addClass('c64-toggleValidation').text('Toggle Validation')),
-                
+
                 this.undoView.$el
             ));
 
@@ -193,7 +175,7 @@ define(["jquery",
                 that.ctx.lineWidth = 1.0;
                 that.ctx.strokeStyle = 'rgb(255,0,200)';
                 that.ctx.scale(that.scale, that.scale);
-                
+
                 _(this.invalidBlocks).each(function(blockIndex) {
                     var n = Math.floor(blockIndex/40);
                     var m = blockIndex % 40;
@@ -205,16 +187,16 @@ define(["jquery",
         },
 
         getBlockRect: function(m, n) {
-            return [this.w/160 * (m*4 - this.boxcorner[0]), 
+            return [this.w/160 * (m*4 - this.boxcorner[0]),
                     this.h/200 * (n*8 - this.boxcorner[1]),
-                    this.w/160*4, 
-                    this.h/200*8];            
+                    this.w/160*4,
+                    this.h/200*8];
         },
 
         getRect: function(i, j) {
-            return [Math.floor(this.w/160 * (i - this.boxcorner[0])*this.scale), 
+            return [Math.floor(this.w/160 * (i - this.boxcorner[0])*this.scale),
                     Math.floor(this.h/200 * (j - this.boxcorner[1])*this.scale),
-                    Math.ceil(this.w/160*this.scale), 
+                    Math.ceil(this.w/160*this.scale),
                     Math.ceil(this.h/200*this.scale)];
         },
 
@@ -254,7 +236,7 @@ define(["jquery",
                     return collection;
                 }, []);
             }
-            
+
             this.repaint();
         },
 
