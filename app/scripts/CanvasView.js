@@ -9,6 +9,9 @@ define(["jquery",
        function($, _, Backbone, ColorSelector, ZoomControl, tools, UndoView, COLORS) {
 
     var ASPECT = 320/200;
+    COLORS = _.map(COLORS, function(rgb) {
+       return 'rgb(' + rgb.join(',') + ')';
+    });
 
     //input = 200 * 160 array
     var validateMulticolor = function(colorIndexArray) {

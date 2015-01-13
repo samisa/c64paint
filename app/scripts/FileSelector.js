@@ -10,7 +10,8 @@ function($, _, Backbone, fileUtil) {
 
         events: {
             'change .c64-fileSelect': 'fileSelected',
-            'click .c64-fileSave': 'savePressed'
+            'click .c64-asPng': 'savePressed',
+            'click .c64-asBinary': 'savePressedBinary'
         },
 
         initialize: function() {
@@ -20,7 +21,8 @@ function($, _, Backbone, fileUtil) {
 
             this.$el.append($('<input type="file">').addClass('c64-fileSelect').text('Open file...'));
              //   <input type="file" nwsaveas />
-            this.$el.append($('<button>').addClass('c64-fileSave').text('Canvas to png...'));
+            this.$el.append($('<button>').addClass('c64-fileSave c64-asPng').text('Canvas to png...'));
+            this.$el.append($('<button>').addClass('c64-fileSave c64-asBinary').text('Canvas to c64 binary...'));
         },
 
         fileSelected: function(ev) {
@@ -32,8 +34,16 @@ function($, _, Backbone, fileUtil) {
             this.trigger('c64:save-image');
         },
 
+        savePressedBinary: function() {
+            this.trigger('c64:save-image-binary');
+        },
+
         saveImg: function(data) {
             fileUtil.saveImg(data);
+        },
+
+        saveBinary: function(data) {
+            fileUtil.saveAsBinary(data, 'foo');
         },
 
         getFileContents: function() {

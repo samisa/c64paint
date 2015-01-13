@@ -17,6 +17,7 @@ define(["jquery",
 
             this.listenTo(this.fileSelector, 'c64:file-selected', this.setFile);
             this.listenTo(this.fileSelector, 'c64:save-image', this.saveImage);
+            this.listenTo(this.fileSelector, 'c64:save-image-binary', this.saveImageBinary);
 
             this.$el
                 .append(this.fileSelector.$el)
@@ -34,7 +35,13 @@ define(["jquery",
 
         saveImage: function() {
             this.fileSelector.saveImg(this.canvasView.getDataRef());
-        }
+        },
 
+        saveImageBinary: function() {
+            this.fileSelector.saveBinary(this.canvasView.getDataRef(), {
+                mode: 'multicolor',
+                backgroundColor: 0
+            });
+        }
     });
 });
