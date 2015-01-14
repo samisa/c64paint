@@ -8,7 +8,38 @@ $widgetBackground: rgb(200, 200, 180);
 $mainBackground: rgb(255, 240, 200);
 $canvasWidth: 750px;
 
-.c64-mainView { 
+@mixin palette {
+    @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
+
+    top: $widgetMargin;
+
+    width: $canvasWidth;
+    position: relative;
+    background-color: $widgetBackground;
+
+    margin: $baseMargin;
+    clear: both;
+    > div {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@mixin dialogContent($width) {
+    border-radius: 10px;
+    background: #D5D5D5;
+    width: $width;
+    top: 50%;
+    padding: 10px;
+    position: fixed;
+    left: 50%;
+    margin-left: -$width/2;
+    margin-top: -100px;
+    z-index: 100001;
+}
+
+.c64-mainView {
     margin-top: 25px;
     margin-left: 50px;
 }
@@ -17,10 +48,50 @@ body {
     background-color: $mainBackground;
     background-image: url('../images/green_cup.png');
     background-repeat: repeat;
- 
+
 }
 
+.c64-dialog {
+    > .c64-dialog-mask {
+        opacity: 0.5;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin-right: auto;
+        margin-left: auto;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 100000;
+    }
+}
 
+.c64-SwapColorDialog {
+    .c64-dialog-content {
+        @include dialogContent(550px);
+
+        > .c64-startColor {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+        }
+    }
+
+    .c64-swapColorPalette {
+        @include palette;
+        width: initial;
+        top: 0px;
+        margin-bottom: 6px;
+
+        > .c64-selected {
+            border-color: black;
+            border-style: solid;
+            border-width: 3px;
+        }
+    }
+}
 
 .c64-CanvasView {
     width: 100%;
@@ -53,7 +124,7 @@ body {
     top: 0px;
 }
 
-.c64-ZoomControl {    
+.c64-ZoomControl {
     margin-bottom: $widgetMargin;
     background-color: $widgetBackground;
     padding: $baseMargin;
@@ -105,6 +176,11 @@ body {
         background-size: 100%;
     }
 
+    .c64-tool-colorswapper {
+        background-image: url('../images/colorswap.png');
+        background-size: 100%;
+    }
+
 }
 
 .c64-gridButtons {
@@ -117,21 +193,7 @@ body {
 }
 
 .c64-ColorSelector {
-    @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
-
-    top: $widgetMargin;
-   
-    width: $canvasWidth;
-    position: relative;
-    background-color: $widgetBackground;
-    
-    margin: $baseMargin;
-    clear: both;
-    > div {
-        display: inline-block;
-        width: 30px;
-        height: 30px;
-    }
+    @include palette;
 
     .c64-secondarySelection {
         position: absolute;
@@ -149,7 +211,6 @@ body {
         border-color: black;
         border-style: solid;
     }
-
 }
 
 .c64-undoView {

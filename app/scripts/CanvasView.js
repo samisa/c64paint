@@ -46,6 +46,9 @@ define(["jquery",
             },
             "click .c64-tool-bucket": function() {
                 this.selectTool('bucket');
+            },
+            "click .c64-tool-colorswapper": function() {
+                this.selectTool('colorswapper');
             }
 
         },
@@ -85,7 +88,8 @@ define(["jquery",
                 this.zoomControl.$el,
                 $('<div>').addClass('c64-toolBox').append(
                     $('<div>').addClass('c64-tool-brush'),
-                    $('<div>').addClass('c64-tool-bucket')),
+                    $('<div>').addClass('c64-tool-bucket'),
+                    $('<div>').addClass('c64-tool-colorswapper')),
                 $('<div>').addClass('c64-gridButtons').append(
                     $('<button>').addClass('c64-toggleGrid').text('Toggle grid'),
                     $('<button>').addClass('c64-toggleValidation').text('Toggle Validation')),
