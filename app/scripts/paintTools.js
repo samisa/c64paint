@@ -74,7 +74,7 @@ function($, _, Backbone, SwapColorDialog) {
         function fill(ev) {
             var xy = getEventCoords(ev);
             var ij = canvasView.toijCoord(xy[0], xy[1]);
-            var startColor = colormap[ij[0] + ij[1] * 160];
+            var startColor = colormap[ij[0] + ij[1] * 320];
             floodFill(ij[0], ij[1], canvasView.currentPrimaryColorIndex, startColor);
             canvasView.repaint();
             that.trigger('c64-paintevent');
@@ -83,12 +83,12 @@ function($, _, Backbone, SwapColorDialog) {
 
         var floodFill = function(i, j, color, startColor) {
             function paintPoint(i, j) {
-                if (colormap[j * 160 + i] === color ||
-                    colormap[j * 160 + i] !== startColor ||
-                    i < 0 || j < 0 || i > 160 || j > 200) {
+                if (colormap[j * 320 + i] === color ||
+                    colormap[j * 320 + i] !== startColor ||
+                    i < 0 || j < 0 || i > 320 || j > 200) {
                     return false;
                 } else {
-                    colormap[j * 160 + i] = color;
+                    colormap[j * 320 + i] = color;
                     return true;
                 }
             }
@@ -108,12 +108,12 @@ function($, _, Backbone, SwapColorDialog) {
             }
         };
 
-        // // this will blow the stack without tail call optimization...
+        // // ahh... woulde be so nice recursively. this will blow the stack...
         // var floodFillRec = function(i, j, color, startColor) {
-        //     if (colormap[j * 160 + i] !== startColor || i < 0 || j < 0 || i > 160 || j > 200) {
+        //     if (colormap[j * 320 + i] !== startColor || i < 0 || j < 0 || i > 320 || j > 200) {
         //         return;
         //     } else {
-        //         colormap[j * 160 + i] = color;
+        //         colormap[j * 320 + i] = color;
         //         floodFillRec(i + 1, j, color, startColor);
         //         floodFillRec(i - 1, j, color, startColor);
         //         floodFillRec(i, j + 1, color, startColor);
@@ -148,7 +148,7 @@ function($, _, Backbone, SwapColorDialog) {
         function promptSwapColor(ev) {
             var xy = getEventCoords(ev);
             var ij = canvasView.toijCoord(xy[0], xy[1]);
-            var startColor = colormap[ij[0] + ij[1] * 160];
+            var startColor = colormap[ij[0] + ij[1] * 320];
 
             var dialog = new SwapColorDialog({ startColor: startColor }).show();
             dialog.getColor()

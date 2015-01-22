@@ -1,15 +1,16 @@
 define(["jquery",
         "underscore",
+        "utils",
         "json!palette.json"],
 
-function($, _, COLORS) {
+function($, _, utils, COLORS) {
     'use strict';
 
-    // assume input bytes contain nothin but color indices
-    // of 320*200 pixels (16 color c64 palette)
-    var bytesToColorIndexMap = function(bytes) {
+    // // assume input bytes contain nothin but color indices
+    // // of 320*200 pixels (16 color c64 palette)
+    // var bytesToColorIndexMap = function(bytes) {
 
-    };
+    // };
 
     // due to lack of good imagefile manipulation libs, use canvas for that purpose
     // convert to appropriate resolution and find closest match from palette, based on slelcted graphics mode
@@ -38,7 +39,7 @@ function($, _, COLORS) {
                     colors[i] = [data[i*4], data[i*4 + 1], data[i*4 + 2]]; // rgb, ignore alpha
                 }
 
-                var byteArray = _colorsToC64ColorIndices(colors);
+                var byteArray = _colorsToC64ColorIndices(colors, mode);
                 def.resolve(byteArray);
             };
 
@@ -55,65 +56,40 @@ function($, _, COLORS) {
     };
 
     //expect [320*200][r,g,b] data
-    //return [320*200]c64index byte array, with 2 adjacent pixels averaged
-    //TODO: now assumes mode=multicolor, next ones to support: hires, mci, ifli
+    //return [320*200]c64index byte array, with 2 adjacent pixels averaged to closest match in c64 palette
+    //TODO:  mci, ifli
     var _colorsToC64ColorIndices = function(colors, mode) {
         var buffer = new window.ArrayBuffer(200 * 320);
         var bytes = new window.Int8Array(buffer);
         var i, j;
 
         for (j = 0; j < 200; j++) {
-            for (i = 0; i < 160; i++) {
-                var color1 = colors[j*320 + 2 * i];
-                var color2 = colors[j*320 + 2 * i + 1];
-                var avrg = _avrg(color1, color2);
-                bytes[j * 320 + 2 * i] = bytes[j * 320 + 2 * i + 1] = _toc64ColorIndex(avrg);
+            for (i = 0; i < 320; i++) {
+                bytes[j * 320 + i] = utils.toc64ColorIndex(colors[j*320 + i]);
             }
         }
 
-        return bytes;
-    };
+        if (mode === 'multicolor' || mode === 'fli') {
+            utils.downSample(bytes);
+        }
 
-    function _avrg(a1, a2) {
-        return [
-            (a1[0] + a2[0]) / 2,
-            (a1[1] + a2[1]) / 2,
-            (a1[2] + a2[2]) / 2
-        ];
-    };
+         return bytes;
+     };
 
-    var _toc64ColorIndex = (function() {
-        return function(c) {
-            var dist2Toc = function(clr, i) {
-                return [
-                    Math.pow(c[0] - clr[0], 2) + Math.pow(c[1] - clr[1], 2) + Math.pow(c[2] - clr[2], 2),
-                    i
-                ];
-            };
+     var saveImg = function(data) {
+         var $canvas = $('<canvas>');
+         var ctx = $canvas[0].getContext("2d");
+         $canvas.attr({'width': '320px'});
+         $canvas.attr({'height': '200px'});
 
-            return _(COLORS)
-                .chain()
-                .map(dist2Toc)
-                .min(function(distAndIndex) { return distAndIndex[0] })
-                .value()[1];
-        };
+         var fillStyles = _.map(COLORS, function(rgb) {
+             return 'rgb(' + rgb.join(',') + ')';
+         });
 
-    })();
-
-    var saveImg = function(data) {
-        var $canvas = $('<canvas>');
-        var ctx = $canvas[0].getContext("2d");
-        $canvas.attr({'width': '320px'});
-        $canvas.attr({'height': '200px'});
-
-        var fillStyles = _.map(COLORS, function(rgb) {
-            return 'rgb(' + rgb.join(',') + ')';
-        });
-
-        for (var j = 0; j < 200; j++) {
-            for (var i = 0; i < 160; i++) {
-                ctx.fillStyle = fillStyles[data[160*j + i]];
-                ctx.fillRect(i*2, j, 2, 1 );
+         for (var j = 0; j < 200; j++) {
+             for (var i = 0; i < 320; i++) {
+                 ctx.fillStyle = fillStyles[data[320*j + i]];
+                 ctx.fillRect(i, j, 1, 1 );
             }
         }
 
@@ -139,6 +115,11 @@ function($, _, COLORS) {
 
         var buffer = new ArrayBuffer(10000);
         var array = new window.Uint8Array(buffer);
+
+        if (settings.mode !== 'multicolor') {
+            throw 'HERE';
+        }
+
         //TODO: support different graphics modes, as well as data layout given in settings
         /*
          now assume multicolormode, (pixels given as 200*160 array) output data layout:
@@ -156,7 +137,7 @@ function($, _, COLORS) {
                 var inCellY = y - Math.floor(y/8) * 8;
                 var inCellPixelPos = inCellX + inCellY * 4;
                 var pixelPos = inCellPixelPos + cell*4*8;
-                cells[pixelPos] = pixels[y*160 + x];
+                cells[pixelPos] = pixels[y*320 + x*2];
             }
         }
 
@@ -195,7 +176,7 @@ function($, _, COLORS) {
     };
 
     return {
-        bytesToColorIndexMap: bytesToColorIndexMap,
+        //bytesToColorIndexMap: bytesToColorIndexMap,
         imageFileToc64: imageFileToc64,
         saveImg: saveImg,
         saveAsBinary: saveAsBinary

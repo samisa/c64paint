@@ -11,9 +11,18 @@ define(["jquery",
         tagName: "div",
         className: 'c64-mainView',
 
+        events: {
+            'c64:mode-selected': 'setMode'
+        },
+
         initialize: function() {
-            this.fileSelector = new FileSelector();
-            this.canvasView = new CanvasView({viewName: 'canvas-view'});
+            this.mode = 'hires';
+
+            this.fileSelector = new FileSelector({ mode: this.mode });
+            this.canvasView = new CanvasView({
+                viewName: 'canvas-view',
+                mode: this.mode
+            });
 
             this.listenTo(this.fileSelector, 'c64:file-selected', this.setFile);
             this.listenTo(this.fileSelector, 'c64:save-image', this.saveImage);
@@ -24,9 +33,14 @@ define(["jquery",
                 .append(this.canvasView.$el);
         },
 
+        setMode: function(ev, mode) {
+            this.mode = mode;
+            this.canvasView.setMode(mode);
+        },
+
         setFile: function() {
             var that = this;
-            this.fileSelector.getFileContents().done(function(bytes) {
+            this.fileSelector.getFileContents(this.mode).done(function(bytes) {
                 //validate bytes...
                 that.canvasView.setImage(bytes);
                 //var colorMap = fileUtil.bytesToColorIndexMap(bytes);
@@ -39,7 +53,7 @@ define(["jquery",
 
         saveImageBinary: function() {
             this.fileSelector.saveBinary(this.canvasView.getDataRef(), {
-                mode: 'multicolor',
+                mode: this.mode,
                 backgroundColor: 0
             });
         }

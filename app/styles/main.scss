@@ -1,5 +1,6 @@
 @import "compass/css3/user-interface";
 @import "compass/css3/box-shadow";
+@import url('http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz');
 
 $baseMargin: 3px;
 $widgetMargin: 6px;
@@ -8,16 +9,25 @@ $widgetBackground: rgb(200, 200, 180);
 $mainBackground: rgb(255, 240, 200);
 $canvasWidth: 750px;
 
+body {
+    font-family: 'Yanone Kaffeesatz', sans-serif !important;
+    font: 'Yanone Kaffeesatz', sans-serif !important;
+    button, input, select {
+        font-family: 'Yanone Kaffeesatz', sans-serif !important;
+        font: 'Yanone Kaffeesatz', sans-serif !important;
+    }
+}
+
 @mixin palette {
     @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
 
     top: $widgetMargin;
 
-    width: $canvasWidth;
+    width: $canvasWidth - $baseMargin;
     position: relative;
     background-color: $widgetBackground;
 
-    margin: $baseMargin;
+    padding: $baseMargin;
     clear: both;
     > div {
         display: inline-block;
@@ -49,6 +59,14 @@ body {
     background-image: url('../images/green_cup.png');
     background-repeat: repeat;
 
+}
+
+.c64-FileSelector {
+    @include box-shadow(rgb(6, 6, 26) 2px 2px 10px);
+    background-color: $widgetBackground;
+    margin-bottom: $baseMargin * 2;
+    padding: $baseMargin;
+    width: $canvasWidth - $baseMargin;
 }
 
 .c64-dialog {
@@ -134,6 +152,8 @@ body {
         display: block;
         margin-left: auto;
         margin-right: auto;
+        //width: 160px;
+        //height: 100px
     }
 
     > .c64-buttons {
@@ -192,12 +212,24 @@ body {
     }
 }
 
+.c64-mode {
+    padding: $baseMargin;
+    margin-bottom: $widgetMargin;
+    background-color: $widgetBackground;
+}
+
+.c64-modeSelector {
+    select {
+        float: right;
+    }
+}
+
 .c64-ColorSelector {
     @include palette;
 
     .c64-secondarySelection {
         position: absolute;
-        right: 0px;
+        right: $baseMargin;
         border-width: 1px;
         border-color: black;
         border-style: solid;
@@ -205,8 +237,7 @@ body {
 
     .c64-primarySelection {
         position: absolute;
-        right: 30px;
-        float: right;
+        right: 30px + $baseMargin;
         border-width: 1px;
         border-color: black;
         border-style: solid;

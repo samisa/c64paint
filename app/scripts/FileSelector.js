@@ -7,6 +7,7 @@ function($, _, Backbone, fileUtil) {
 
     return Backbone.View.extend({
         tagName: "div",
+        className: 'c64-FileSelector',
 
         events: {
             'change .c64-fileSelect': 'fileSelected',
@@ -42,13 +43,13 @@ function($, _, Backbone, fileUtil) {
             fileUtil.saveImg(data);
         },
 
-        saveBinary: function(data) {
-            fileUtil.saveAsBinary(data, 'foo');
+        saveBinary: function(data, settings) {
+            fileUtil.saveAsBinary(data, settings);
         },
 
-        getFileContents: function() {
+        getFileContents: function(mode) {
             if (this.file.type.match(/^image/)) {
-                return fileUtil.imageFileToc64(this.file);
+                return fileUtil.imageFileToc64(this.file, mode);
             }
 
             //Otherwise assume it's pure color index data
