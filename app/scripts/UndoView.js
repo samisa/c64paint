@@ -28,7 +28,7 @@ function($, _, Backbone) {
                 var buffer = new ArrayBuffer(dataRef.length);
                 that.buffer.push(new Int8Array(buffer));
             });
- 
+
             this.pushState();
 
             this.$el.append($('<button>').addClass('c64-undo-button').text('undo'),

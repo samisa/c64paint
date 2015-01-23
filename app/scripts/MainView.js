@@ -48,11 +48,11 @@ define(["jquery",
         },
 
         saveImage: function() {
-            this.fileSelector.saveImg(this.canvasView.getDataRef());
+            this.fileSelector.saveImg(this.canvasView.getImgRef());
         },
 
         saveImageBinary: function() {
-            this.fileSelector.saveBinary(this.canvasView.getDataRef(), {
+            this.fileSelector.saveBinary(this.canvasView.getIndexedColorMap(), {
                 mode: this.mode,
                 backgroundColor: 0
             });

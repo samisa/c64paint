@@ -56,32 +56,8 @@ function($, _, Backbone) {
             this.trigger('c64:zoomRectChanged', { center: this.center, scale: this.scale });
         },
 
-        paintPixels: function() {
-            var i, j;
-            for (j = 0; j < 200; j++) {
-                for (i = 0; i < 320; i++) {
-                    this.drawPoint(i, j, this.options.colors[this.options.bitmapRef[j * 320 + i]]);
-                }
-            }
-        },
-
-        drawPoint: function(i, j, color) {
-            this.ctx.save();
-
-            //TODO: depends on mode
-            var rect = [i * this.w / 320,
-                        j * this.h / 200,
-                        this.w / 320,
-                        this.h / 200];
-
-            this.ctx.fillStyle = color;
-            this.ctx.fillRect(Math.floor(rect[0]), Math.floor(rect[1]), Math.ceil(rect[2]), Math.ceil(rect[3]));
-
-            this.ctx.restore();
-        },
-
         render: function() {
-            this.paintPixels();
+            this.ctx.drawImage(this.options.imageRef, 0, 0, this.w, this.h);
 
             //drawbox
             var s = this.scale;

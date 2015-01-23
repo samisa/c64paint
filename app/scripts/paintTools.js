@@ -67,7 +67,7 @@ function($, _, Backbone, SwapColorDialog) {
     };
 
     var Bucket = function(canvasView){
-        var colormap = canvasView.getDataRef();
+        var colormap = canvasView.getIndexedColorMap();
         var $canvas = canvasView.get$Canvas();
         var that = this;
 
@@ -76,7 +76,7 @@ function($, _, Backbone, SwapColorDialog) {
             var ij = canvasView.toijCoord(xy[0], xy[1]);
             var startColor = colormap[ij[0] + ij[1] * 320];
             floodFill(ij[0], ij[1], canvasView.currentPrimaryColorIndex, startColor);
-            canvasView.repaint();
+            canvasView.setIndexedColorMap(colormap);
             that.trigger('c64-paintevent');
             return false;
         }
@@ -130,7 +130,7 @@ function($, _, Backbone, SwapColorDialog) {
     };
 
     var ColorSwapper = function(canvasView) {
-        var colormap = canvasView.getDataRef();
+        var colormap = canvasView.getIndexedColorMap();
         var $canvas = canvasView.get$Canvas();
         var that = this;
 
@@ -141,7 +141,7 @@ function($, _, Backbone, SwapColorDialog) {
                 }
             }
 
-            canvasView.repaint();
+            canvasView.setIndexedColorMap(colormap);
             that.trigger('c64-paintevent');
         };
 
