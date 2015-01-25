@@ -1,6 +1,6 @@
-define(["jquery", 
+define(["jquery",
         "underscore",
-        "backbone"], 
+        "backbone"],
 function($, _, Backbone) {
 
     /**
@@ -12,21 +12,22 @@ function($, _, Backbone) {
 
         events: {
             'click .c64-undo-button': 'undo',
-            'click .c64-redo-button': 'redo',
+            'click .c64-redo-button': 'redo'
         },
 
-        initialize: function(dataRef, depth) {
+        initialize: function(opts) {
             var that = this;
-            this.dataRef = dataRef;
-            this.depth = depth;
-            this.buffer = [];
+            this.depth = opts.depth;
+            this.stack = [];
             this.bufferPointer = -1;
             this.stackPointer = -1;
             this.size = 0;
 
-            _(depth).times(function() {
-                var buffer = new ArrayBuffer(dataRef.length);
-                that.buffer.push(new Int8Array(buffer));
+            this.canvasView = opts.canvasView;
+
+            _(opts.depth).times(function() {
+                var dataBuff = new ArrayBuffer(320*200);
+                that.stack.push(new Int8Array(dataBuff));
             });
 
             this.pushState();
@@ -47,11 +48,13 @@ function($, _, Backbone) {
             if (this.stackPointer > 0) {
                 this.$el.find('.c64-undo-button').attr({ 'disabled': false });
             }
-        
+
             this.bufferPointer = (this.bufferPointer + 1) % (this.depth);
-            this._copyData(this.dataRef, this.buffer[this.bufferPointer]);            
+
+            here too slow
+            this._copyData(this.canvasView.getIndexedColorMap(), this.stack[this.bufferPointer]);
         },
-        
+
         undo: function() {
             if (this.stackPointer === 0) {
                 return; //no states left, do nothing
@@ -59,17 +62,13 @@ function($, _, Backbone) {
 
 
             this.$el.find('.c64-redo-button').attr({ 'disabled': false });
-
-            this.bufferPointer = this.bufferPointer > 0 ? this.bufferPointer - 1 : this.depth - 1; 
+            this.bufferPointer = this.bufferPointer > 0 ? this.bufferPointer - 1 : this.depth - 1;
             this.stackPointer--;
+            this.canvasView.setIndexedColorMap(this.stack[this.bufferPointer]);
 
-            this._copyData(this.buffer[this.bufferPointer], this.dataRef);
-          
             if (this.stackPointer === 0) {
                 this.$el.find('.c64-undo-button').attr({ 'disabled': true });
             }
-
-            this.trigger('c64:undo');
         },
 
         redo: function() {
@@ -81,14 +80,11 @@ function($, _, Backbone) {
             this.bufferPointer = (this.bufferPointer + 1) % this.depth;
 
             if (this.stackPointer >= this.size - 1) {
-                this.$el.find('.c64-redo-button').attr({ 'disabled': true });      
+                this.$el.find('.c64-redo-button').attr({ 'disabled': true });
             }
 
             this.$el.find('.c64-undo-button').attr({ 'disabled': false });
-
-            this._copyData(this.buffer[this.bufferPointer], this.dataRef);            
-
-            this.trigger('c64:redo');
+            this.canvasView.setIndexedColorMap(this.stack[this.bufferPointer]);
         },
 
         _copyData: function(src, dst) {
