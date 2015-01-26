@@ -77,22 +77,6 @@ function($, _, utils, COLORS) {
      };
 
      var saveImg = function(imgRef) {
-        //  var $canvas = $('<canvas>');
-        //  var ctx = $canvas[0].getContext("2d");
-        //  $canvas.attr({'width': '320px'});
-        //  $canvas.attr({'height': '200px'});
-
-        //  var fillStyles = _.map(COLORS, function(rgb) {
-        //      return 'rgb(' + rgb.join(',') + ')';
-        //  });
-
-        //  for (var j = 0; j < 200; j++) {
-        //      for (var i = 0; i < 320; i++) {
-        //          ctx.fillStyle = fillStyles[data[320*j + i]];
-        //          ctx.fillRect(i, j, 1, 1 );
-        //     }
-        // }
-
         window.open(imgRef.toDataURL("image/png"));
     };
 

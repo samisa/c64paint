@@ -55,6 +55,7 @@ define(["jquery",
         }).value();
     };
 
+
     return Backbone.View.extend({
         tagName: "div",
         className: 'c64-CanvasView',
@@ -82,9 +83,9 @@ define(["jquery",
             this.$canvas = $('<canvas>').addClass('c64-paintCanvas');
             this.$el.append(this.$canvas);
             this.ctx = this.$canvas[0].getContext("2d");
-            this.$canvas2 = $('<canvas>').addClass('c64-hiddenCanvas');
-            this.$el.append(this.$canvas2);
-            this.ctx2 = this.$canvas2[0].getContext("2d");
+            this.$canvasHidden = $('<canvas>').addClass('c64-hiddenCanvas');
+            this.$el.append(this.$canvasHidden);
+            this.ctxHidden = this.$canvasHidden[0].getContext("2d");
 
             //Big enough to reduce smoothing of pixels when scaling. multiple of the c64 resolution to avoid artifacts.
             this.w = 320*3;
@@ -96,17 +97,17 @@ define(["jquery",
 
             this.$canvas.attr({'width': this.w + 'px'});
             this.$canvas.attr({'height': this.h + 'px'});
-            this.$canvas2.attr({'width': this.w + 'px'});
-            this.$canvas2.attr({'height': this.h + 'px'});
+            this.$canvasHidden.attr({'width': this.w + 'px'});
+            this.$canvasHidden.attr({'height': this.h + 'px'});
 
-            this.ctx2.fillStyle = 'rgba(0, 0, 0, 255)';
-            this.ctx2.fillRect(0, 0, this.w, this.h);
+            this.ctxHidden.fillStyle = 'rgba(0, 0, 0, 255)';
+            this.ctxHidden.fillRect(0, 0, this.w, this.h);
             this.scale = 1;
 
             this.scale = 1;
             this.boxcorner = [0, 0];
 
-            this.zoomControl = new ZoomControl({ imageRef: this.$canvas2[0] });
+            this.zoomControl = new ZoomControl({ imageRef: this.$canvasHidden[0] });
             this.listenTo(this.zoomControl, 'c64:zoomRectChanged', this.setViewBox);
 
             var colorSelector = new ColorSelector({ colors: COLOR_STYLES });
@@ -144,7 +145,16 @@ define(["jquery",
         },
 
         getImgRef: function() {
-            return this.$canvas2[0];
+            return this.$canvasHidden[0];
+        },
+
+        getImgData: function() {
+            return this.ctxHidden.getImageData(0, 0, this.w, this.h);
+        },
+
+        setImgData: function(imgData) {
+            this.ctxHidden.putImageData(imgData, 0, 0);
+            this.repaint();
         },
 
         setImage: function(pixels) {//assume 200x320 pixels
@@ -171,7 +181,7 @@ define(["jquery",
         repaint: function() {
             var i, j;
 
-            this.ctx.drawImage(this.$canvas2[0], this.boxcorner[0] * this.w/320, this.boxcorner[1] * this.h/200, this.w/this.scale, this.h/this.scale,
+            this.ctx.drawImage(this.$canvasHidden[0], this.boxcorner[0] * this.w/320, this.boxcorner[1] * this.h/200, this.w/this.scale, this.h/this.scale,
                                                  0, 0, this.w, this.h);
 
             if (this.showGrid) {
@@ -244,9 +254,9 @@ define(["jquery",
         _pixelToCanvas: function(i, j, color) {
             this.ctx.save();
             var rect = this.getRect(i, j);
-            this.ctx2.fillStyle = COLOR_STYLES[color];
-            this.ctx2.fillRect(rect[0], rect[1], rect[2], rect[3]);
-            this.ctx2.restore();
+            this.ctxHidden.fillStyle = COLOR_STYLES[color];
+            this.ctxHidden.fillRect(rect[0], rect[1], rect[2], rect[3]);
+            this.ctxHidden.restore();
         },
 
         paintPixel: function(x, y, useSecondaryColor) {
@@ -312,7 +322,7 @@ define(["jquery",
         },
 
         getIndexedColorMap: function() {
-            var data = this.ctx2.getImageData(0, 0, this.w, this.h).data;
+            var data = this.ctxHidden.getImageData(0, 0, this.w, this.h).data;
             var indices = [];
             var scale = this.w/320;
 
@@ -331,7 +341,7 @@ define(["jquery",
         setIndexedColorMap: function(colormap) {
             for (var j = 0; j < 200; j++) {
                 for (var i = 0; i < 320; i++) {
-                    this._pixelToCanvas(i, j, colormap[j*320 + i]); //ON multicolor mode this will do double work...as pixel to canvas takes care of pixel width...
+                    this._pixelToCanvas(i, j, colormap[j*320 + i]); //TODO: ON multicolor mode this will do double work...as pixel to canvas takes care of pixel width...
                 }
             }
             this.repaint();
