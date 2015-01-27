@@ -97,7 +97,7 @@ function($, _, utils, COLORS) {
             return  clr === bgr ? 0 : colors.indexOf(clr)+1;
         }
 
-        var buffer = new ArrayBuffer(10000);
+        var buffer = new ArrayBuffer(10001);
         var array = new window.Uint8Array(buffer);
 
         if (settings.mode !== 'multicolor') {
@@ -105,7 +105,6 @@ function($, _, utils, COLORS) {
         }
 
         //TODO:s
-        /* 1: background color should be chosen by user, (also fix validation to take that into account)
         /* 2: support hires
         /* 3: fli*/
         /* 4: mci, ifli*/
@@ -128,7 +127,7 @@ function($, _, utils, COLORS) {
         var bgr = settings.backgroundColor;
         var SCREENDATAORIGIN = 8000;
         var COLORDATAORIGIN = 9000;
-
+        var BACKGROUNDCOLORORIGIN = 10000;
         for (cell = 0; cell < 40 * 25; cell++) {
             var colorsInCell = _(cells.slice(cell*8*4, (cell+1)*8*4))
                     .chain()
@@ -155,6 +154,8 @@ function($, _, utils, COLORS) {
                      fix(cells[p2+3], bgr, colorsInCell);
             }
         }
+
+        array[BACKGROUNDCOLORORIGIN] = bgr;
 
         return array;
     };

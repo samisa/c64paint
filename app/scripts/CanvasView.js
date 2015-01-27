@@ -4,11 +4,12 @@ define(["jquery",
         "ColorSelector",
         "ZoomControl",
         "ModeSelector",
+        "BackgroundColorSelector",
         "paintTools",
         "UndoView",
         "utils",
         "json!palette.json"],
-       function($, _, Backbone, ColorSelector, ZoomControl, ModeSelector, tools, UndoView, utils, COLORS) {
+       function($, _, Backbone, ColorSelector, ZoomControl, ModeSelector, BackgroundColorSelector, tools, UndoView, utils, COLORS) {
 
     var ASPECT = 320/200;
     var COLOR_STYLES = _.map(COLORS, function(rgb) {
@@ -25,33 +26,24 @@ define(["jquery",
     };
 
     //input = 200 * 320 array
-    var validate = function(colorIndexArray, mode) {
+    var validate = function(colorIndexArray, mode, backgroundColor) {
         var blocks = []; //pixels to blocks
         var blockIndex;
         var i, j;
 
-        if (mode === 'multicolor') {
-            for (j = 0; j < 200; j++) {
-                for (i = 0; i < 320; i+=2) { //we can assume adjacent pairs are of same color....... could assert this????
-                    //blocks per row = 40
-                    blockIndex = (40 * Math.floor(j / 8)) + Math.floor(i / 8);
-                    blocks[blockIndex] = blocks[blockIndex] || [];
-                    blocks[blockIndex].push(colorIndexArray[320*j + i]);
-                }
-            }
-        } else {
-            for (j = 0; j < 200; j++) {
-                for (i = 0; i < 320; i+=1) {
-                    //blocks per row = 40
-                    blockIndex = (40 * Math.floor(j / 8)) + Math.floor(i / 8);
-                    blocks[blockIndex] = blocks[blockIndex] || [];
-                    blocks[blockIndex].push(colorIndexArray[320*j + i]);
-                }
+        for (j = 0; j < 200; j++) {
+            for (i = 0; i < 320; i+=(mode === 'multicolor' ? 2 : 1)) { //we can assume adjacent pairs are of same color....... could assert this????
+                var color = colorIndexArray[320*j + i];
+                if (color === backgroundColor) continue;
+                //blocks per row = 40
+                blockIndex = (40 * Math.floor(j / 8)) + Math.floor(i / 8);
+                blocks[blockIndex] = blocks[blockIndex] || [];
+                blocks[blockIndex].push(color);
             }
         }
 
         return _.chain(blocks).map(function(b) {
-            return _.uniq(b).length <= (mode === 'multicolor' ? 4 : 2);
+            return _.uniq(b).length <= (mode === 'multicolor' ? 3 : 1);
         }).value();
     };
 
@@ -117,7 +109,11 @@ define(["jquery",
             colorSelector.selectPrimaryColor(1);
             colorSelector.selectSecondaryColor(0);
 
-            this.undoView = new UndoView({canvasView: this, depth: 4 });
+            this.undoView = new UndoView({ canvasView: this, depth: 4 });
+            this.backgroundColorSelector = new BackgroundColorSelector({
+                initialColor: 0,
+                colorStyles: COLOR_STYLES
+            });
 
             this.$el.append($('<div>').addClass('c64-sidePanel').append(
                 this.zoomControl.$el,
@@ -125,12 +121,11 @@ define(["jquery",
                     $('<div>').addClass('c64-tool-brush'),
                     $('<div>').addClass('c64-tool-bucket'),
                     $('<div>').addClass('c64-tool-colorswapper')),
-                $('<div>').addClass('c64-mode').append(
-                    new ModeSelector({ mode: options.mode }).$el),
+                new ModeSelector({ mode: options.mode }).$el,
+                this.backgroundColorSelector.$el,
                 $('<div>').addClass('c64-gridButtons').append(
                     $('<button>').addClass('c64-toggleGrid').text('Toggle grid'),
                     $('<button>').addClass('c64-toggleValidation').text('Toggle/Refresh Validation')),
-
                 this.undoView.$el
             ));
 
@@ -281,7 +276,7 @@ define(["jquery",
 
         refreshValidation: function() {
             if (this.showValidation) {
-                this.invalidBlocks = _(validate(this.getIndexedColorMap(), this.mode)).reduce(function(collection, isValid, index) {
+                this.invalidBlocks = _(validate(this.getIndexedColorMap(), this.mode, this.getBackgroundColor())).reduce(function(collection, isValid, index) {
                     if (!isValid) {
                         collection.push(index);
                     }
@@ -345,6 +340,11 @@ define(["jquery",
                 }
             }
             this.repaint();
+        },
+
+        getBackgroundColor: function() {
+            return this.backgroundColorSelector.getColor();
         }
+
     });
 });

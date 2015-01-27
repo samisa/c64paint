@@ -54,7 +54,7 @@ define(["jquery",
         saveImageBinary: function() {
             this.fileSelector.saveBinary(this.canvasView.getIndexedColorMap(), {
                 mode: this.mode,
-                backgroundColor: 0
+                backgroundColor: this.canvasView.getBackgroundColor()
             });
         }
     });

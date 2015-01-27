@@ -29,7 +29,8 @@ body {
 
     padding: $baseMargin;
     clear: both;
-    > div {
+
+    .c64-colorItem {
         display: inline-block;
         width: 30px;
         height: 30px;
@@ -47,6 +48,12 @@ body {
     margin-left: -$width/2;
     margin-top: -100px;
     z-index: 100001;
+}
+
+.c64-colorItem {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
 }
 
 .c64-mainView {
@@ -108,6 +115,19 @@ body {
             border-style: solid;
             border-width: 3px;
         }
+    }
+}
+
+.c64-SelectColorDialog {
+    .c64-dialog-content {
+        @include dialogContent(486px);
+    }
+
+    .c64-selectColorPalette {
+        @include palette;
+        width: initial;
+        top: 0px;
+        margin-bottom: 6px;
     }
 }
 
@@ -231,13 +251,10 @@ body {
     }
 }
 
-.c64-mode {
+.c64-modeSelector {
     padding: $baseMargin;
     margin-bottom: $widgetMargin;
     background-color: $widgetBackground;
-}
-
-.c64-modeSelector {
     select {
         float: right;
     }
@@ -260,6 +277,20 @@ body {
         border-width: 1px;
         border-color: black;
         border-style: solid;
+    }
+}
+
+.c64-BackgroundColorSelector {
+    position: relative;
+    line-height: 30px;
+    margin-bottom: $widgetMargin;
+    padding: $baseMargin;
+    background-color: $widgetBackground;
+
+    .c64-colorItem {
+        position: absolute;
+        top: $baseMargin;
+        right: $baseMargin;
     }
 }
 
