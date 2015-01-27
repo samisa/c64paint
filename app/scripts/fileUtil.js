@@ -104,13 +104,12 @@ function($, _, utils, COLORS) {
             throw 'HERE';
         }
 
-        //TODO: support different graphics modes, as well as data layout given in settings
-        /* background color should be chosen automatically or by user, (also fix validation to take that into account)
-        /*
-         now assume multicolormode, (pixels given as 200*320 array) output data layout:
-         8000 bytes contain bitmap,
-         next 1000 bytes contain
-         */
+        //TODO:s
+        /* 1: background color should be chosen by user, (also fix validation to take that into account)
+        /* 2: support hires
+        /* 3: fli*/
+        /* 4: mci, ifli*/
+        /* 5: data layout chosen by user */
 
         var x, y;
         // arrange to 25*40 cells each of size 4*8
