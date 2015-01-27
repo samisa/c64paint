@@ -105,8 +105,9 @@ function($, _, utils, COLORS) {
         }
 
         //TODO: support different graphics modes, as well as data layout given in settings
+        /* background color should be chosen automatically or by user, (also fix validation to take that into account)
         /*
-         now assume multicolormode, (pixels given as 200*160 array) output data layout:
+         now assume multicolormode, (pixels given as 200*320 array) output data layout:
          8000 bytes contain bitmap,
          next 1000 bytes contain
          */

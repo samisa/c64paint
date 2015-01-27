@@ -7,13 +7,10 @@ function($, _, Backbone, SwapColorDialog) {
 
     function getEventCoords(ev) {
         var x, y;
-        if (ev.layerX || ev.layerX == 0) { // Firefox
-            x = ev.layerX;
-            y = ev.layerY;
-        } else if (ev.offsetX || ev.offsetX == 0) { // Opera
-            x = ev.offsetX;
-            y = ev.offsetY;
-        }
+
+        var canoffset = $(ev.target).offset();
+        x = ev.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
+        y = ev.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
 
         return [x,y];
     }
