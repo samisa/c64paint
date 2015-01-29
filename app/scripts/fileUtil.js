@@ -81,15 +81,18 @@ function($, _, utils, COLORS) {
     };
 
     var saveAsBinary = function(pixels, settings) {
-        var saveLink = document.createElement("a");
+        var fileName = 'foo.bin';
         var array = _imgToBinary(pixels, settings);
         var blob = new window.Blob([array], { type: 'application/octet-binary' });
-
         var url = window.URL.createObjectURL(blob);
-        saveLink.href = url;
-        saveLink.download = 'foo.bin';
-        saveLink.click();
-        window.URL.revokeObjectURL(url);
+        var $saveLink = $("<a download='" + fileName + "' href='" + url + "'></a>");
+
+        $saveLink.appendTo('body');
+        var x = $saveLink[0].click();
+        $saveLink.remove();
+        _.defer(function() { //click won't do anything if not deferred on Firefox
+            window.URL.revokeObjectURL(url);
+        });
     };
 
     // arrange to 25*40 cells each of size 4*8 or 8*8 depending on mode
@@ -128,6 +131,7 @@ function($, _, utils, COLORS) {
 
 
         //TODO:s
+        // 1: Firefox binary export not working
         /* 3: support fli*/
         /* 4: mci, ifli*/
         /* 5: data layout chosen by user */

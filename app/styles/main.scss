@@ -252,6 +252,7 @@ body {
 }
 
 .c64-modeSelector {
+    overflow: auto;
     padding: $baseMargin;
     margin-bottom: $widgetMargin;
     background-color: $widgetBackground;
@@ -298,7 +299,6 @@ body {
     background-color: $widgetBackground;
     padding: $baseMargin;
     > button {
-        height: 20px;
         width: 50%;
     }
 }
