@@ -40,6 +40,14 @@ function($, _, Backbone, SelectColorDialog) {
 
         getColor: function() {
             return this.color;
+        },
+
+        disable: function() {
+            this.$el.hide();
+        },
+
+        enable: function() {
+            this.$el.show();
         }
     });
 });

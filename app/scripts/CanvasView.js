@@ -34,7 +34,7 @@ define(["jquery",
         for (j = 0; j < 200; j++) {
             for (i = 0; i < 320; i+=(mode === 'multicolor' ? 2 : 1)) { //we can assume adjacent pairs are of same color....... could assert this????
                 var color = colorIndexArray[320*j + i];
-                if (color === backgroundColor) continue;
+                if (mode === 'multicolor' && color === backgroundColor) continue;
                 //blocks per row = 40
                 blockIndex = (40 * Math.floor(j / 8)) + Math.floor(i / 8);
                 blocks[blockIndex] = blocks[blockIndex] || [];
@@ -43,7 +43,7 @@ define(["jquery",
         }
 
         return _.chain(blocks).map(function(b) {
-            return _.uniq(b).length <= (mode === 'multicolor' ? 3 : 1);
+            return _.uniq(b).length <= (mode === 'multicolor' ? 3 : 2);
         }).value();
     };
 
@@ -299,6 +299,12 @@ define(["jquery",
         },
 
         setMode: function(mode) {
+            if (mode === 'hires') {
+                this.backgroundColorSelector.disable();
+            } else {
+                this.backgroundColorSelector.enable();
+            }
+
             if (this.mode === 'hires' && mode !== 'hires') {
                 this.pushState();
                 this.mode = mode;
@@ -343,7 +349,7 @@ define(["jquery",
         },
 
         getBackgroundColor: function() {
-            return this.backgroundColorSelector.getColor();
+            return this.mode === 'multicolor' ? this.backgroundColorSelector.getColor() : undefined;
         }
 
     });

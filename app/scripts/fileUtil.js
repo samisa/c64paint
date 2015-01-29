@@ -92,44 +92,57 @@ function($, _, utils, COLORS) {
         window.URL.revokeObjectURL(url);
     };
 
+    // arrange to 25*40 cells each of size 4*8 or 8*8 depending on mode
+    function _toCells(pixels, mode) {
+        var x, y;
+        var cells = [];
+        var xRes = (mode === 'multicolor' ? 160 : 320);
+        var xResPerBlock = (mode === 'multicolor' ? 4 : 8);
+        var xPixelWidth = (mode === 'multicolor' ? 2 : 1);
+        for (y = 0; y < 200; y++) {
+            for(x = 0; x < xRes; x++) {
+                var cell = Math.floor(y/8)*40 + Math.floor(x/xResPerBlock);
+                var inCellX = x - Math.floor(x/xResPerBlock) * xResPerBlock;
+                var inCellY = y - Math.floor(y/8) * 8;
+                var inCellPixelPos = inCellX + inCellY * xResPerBlock;
+                var pixelPos = inCellPixelPos + cell*xResPerBlock*8;
+                cells[pixelPos] = pixels[y*320 + x*xPixelWidth];
+            }
+        }
+
+        return cells;
+    }
+
     var _imgToBinary = function(pixels, settings) {
         function fix(clr, bgr, colors) {
             return  clr === bgr ? 0 : colors.indexOf(clr)+1;
         }
 
-        var buffer = new ArrayBuffer(10001);
-        var array = new window.Uint8Array(buffer);
-
-        if (settings.mode !== 'multicolor') {
+        if (settings.mode !== 'multicolor' && settings.mode !== 'hires')  {
             throw 'HERE';
         }
 
+        var buffer = settings.mode === 'multicolor' ? new ArrayBuffer(10001) :
+                new ArrayBuffer(9000);
+        var array = new window.Uint8Array(buffer);
+
+
         //TODO:s
-        /* 2: support hires
-        /* 3: fli*/
+        /* 3: support fli*/
         /* 4: mci, ifli*/
         /* 5: data layout chosen by user */
 
-        var x, y;
-        // arrange to 25*40 cells each of size 4*8
-        var cells = [];
-        for(y = 0; y < 200; y++) {
-            for(x = 0; x < 160; x++) {
-                var cell = Math.floor(y/8)*40 + Math.floor(x/4);
-                var inCellX = x - Math.floor(x/4) * 4;
-                var inCellY = y - Math.floor(y/8) * 8;
-                var inCellPixelPos = inCellX + inCellY * 4;
-                var pixelPos = inCellPixelPos + cell*4*8;
-                cells[pixelPos] = pixels[y*320 + x*2];
-            }
-        }
-
+        var cells = _toCells(pixels, settings.mode);
         var bgr = settings.backgroundColor;
+
+
         var SCREENDATAORIGIN = 8000;
-        var COLORDATAORIGIN = 9000;
+        var COLORDATAORIGIN = 9000; //hires mode does not use this nor background
         var BACKGROUNDCOLORORIGIN = 10000;
-        for (cell = 0; cell < 40 * 25; cell++) {
-            var colorsInCell = _(cells.slice(cell*8*4, (cell+1)*8*4))
+
+        var xres = settings.mode === 'multicolor' ? 4 : 8;
+        for (var cell = 0; cell < 40 * 25; cell++) {
+            var colorsInCell = _(cells.slice(cell*8*xres, (cell+1)*8*xres))
                     .chain()
                     .uniq()
                     .without(bgr)
@@ -145,17 +158,35 @@ function($, _, utils, COLORS) {
                 }
             }
 
-            for (var i = 0; i < 8; i++) {
-                var p = cell*8 + i;
-                var p2 = cell*8*4 + i*4;
-                array[p] = (fix(cells[p2], bgr, colorsInCell) << 6) |
-                    (fix(cells[p2+1], bgr, colorsInCell) << 4) |
-                    (fix(cells[p2+2], bgr, colorsInCell) << 2) |
-                     fix(cells[p2+3], bgr, colorsInCell);
+            for (var i = 0; i < 8; i++) { //loop over lines in cell. Each line will be represented by one byte in the bitmap
+                var posInArray = cell*8 + i;
+                var posInCells;
+
+                if (settings.mode === 'multicolor') {
+                    posInCells = cell*8*4 + i*4;
+                    array[posInArray] =
+                        (fix(cells[posInCells], bgr, colorsInCell) << 6) |
+                        (fix(cells[posInCells+1], bgr, colorsInCell) << 4) |
+                        (fix(cells[posInCells+2], bgr, colorsInCell) << 2) |
+                         fix(cells[posInCells+3], bgr, colorsInCell);
+                } else if (settings.mode === 'hires') {
+                    posInCells = cell*8*8 + i*8;
+                    array[posInArray] =
+                      ~((colorsInCell.indexOf(cells[posInCells]) << 7) |
+                        (colorsInCell.indexOf(cells[posInCells+1]) << 6) |
+                        (colorsInCell.indexOf(cells[posInCells+2]) << 5) |
+                        (colorsInCell.indexOf(cells[posInCells+3]) << 4) |
+                        (colorsInCell.indexOf(cells[posInCells+4]) << 3) |
+                        (colorsInCell.indexOf(cells[posInCells+5]) << 2) |
+                        (colorsInCell.indexOf(cells[posInCells+6]) << 1) |
+                        (colorsInCell.indexOf(cells[posInCells+7])));
+                }
             }
         }
 
-        array[BACKGROUNDCOLORORIGIN] = bgr;
+        if (settings.mode === 'multicolor') {
+            array[BACKGROUNDCOLORORIGIN] = bgr;
+        }
 
         return array;
     };
