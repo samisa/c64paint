@@ -118,6 +118,17 @@ body {
     }
 }
 
+.c64-BinarySaveDialog {
+    .c64-dialog-content {
+        @include dialogContent(486px);
+    }
+
+    .c64-fileNameInput {
+        margin-top: $baseMargin;
+        margin-bottom: $baseMargin;
+    }
+}
+
 .c64-SelectColorDialog {
     .c64-dialog-content {
         @include dialogContent(486px);
