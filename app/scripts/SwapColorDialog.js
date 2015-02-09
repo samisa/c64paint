@@ -19,7 +19,6 @@ define(["jquery",
             },
             "click .c64-okButton": '_resolve',
             "click .c64-cancelButton": '_cancel'
-
         },
 
         initialize: function(opts) {

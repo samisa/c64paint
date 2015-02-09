@@ -1,8 +1,9 @@
 define(["jquery",
         "underscore",
         "backbone",
-        "fileUtil"],
-function($, _, Backbone, fileUtil) {
+        "fileUtil",
+        "BinarySaveDialog"],
+function($, _, Backbone, fileUtil, BinarySaveDialog) {
     'use strict';
 
     return Backbone.View.extend({
@@ -44,7 +45,12 @@ function($, _, Backbone, fileUtil) {
         },
 
         saveBinary: function(data, settings) {
-            fileUtil.saveAsBinary(data, settings);
+            var dialog = new BinarySaveDialog(settings).show();
+            dialog.getPromise().done(function() {
+                fileUtil.saveAsBinary(data, settings);
+            }).always(function() {
+                dialog.dismiss();
+            });
         },
 
         getFileContents: function(mode) {

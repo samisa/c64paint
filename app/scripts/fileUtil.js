@@ -81,7 +81,7 @@ function($, _, utils, COLORS) {
     };
 
     var saveAsBinary = function(pixels, settings) {
-        var fileName = 'foo.bin';
+        var fileName = settings.fileName;
         var array = _imgToBinary(pixels, settings);
         var blob = new window.Blob([array], { type: 'application/octet-binary' });
         var url = window.URL.createObjectURL(blob);
@@ -131,10 +131,10 @@ function($, _, utils, COLORS) {
 
 
         //TODO:s
-        // 1: Firefox binary export not working
+        // 1: document somewhere layout of output data. eg in filename dialog
         /* 3: support fli*/
         /* 4: mci, ifli*/
-        /* 5: data layout chosen by user */
+        /* 5: data layout chosen by user?? */
 
         var cells = _toCells(pixels, settings.mode);
         var bgr = settings.backgroundColor;
